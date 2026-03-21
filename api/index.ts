@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import authRoutes from '../server/routes/authRoutes';
 import promptRoutes from '../server/routes/promptRoutes';
 import teamRoutes from '../server/routes/teamRoutes';
@@ -9,14 +11,23 @@ import invitationRoutes from '../server/routes/invitationRoutes';
 import categoryRoutes from '../server/routes/categoryRoutes';
 import settingsRoutes from '../server/routes/settingsRoutes';
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/promptvault';
 
 app.use(cors());
 app.use(express.json());
+
+// Middleware to ensure DB is connected
+app.use((req, res, next) => {
+  if (mongoose.connection.readyState !== 1 && req.path !== '/api/health') {
+    return res.status(503).json({ 
+      error: 'Database connecting...', 
+      readyState: mongoose.connection.readyState 
+    });
+  }
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
