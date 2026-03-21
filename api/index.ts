@@ -26,14 +26,31 @@ app.use('/api/invitations', invitationRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Health check
+// Connect to MongoDB with timeout and proper error reporting
+console.log('Initiating MongoDB connection...');
+mongoose.connect(MONGO_URI, {
+  serverSelectionTimeoutMS: 5000,
+})
+  .then(() => console.log('Successfully connected to MongoDB'))
+  .catch((err) => console.error('CRITICAL: Failed to connect to MongoDB:', err.message));
+
+// Health check with DB status
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
+  res.status(200).json({ 
+    status: 'ok', 
+    dbState: mongoose.connection.readyState,
+    environment: process.env.NODE_ENV 
+  });
 });
 
-// Connect to MongoDB (Vercel will reuse the connection across invocations)
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('Failed to connect to MongoDB', err));
+// Global Error Handler
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('Unhandled Server Error:', err);
+  res.status(500).json({ 
+    error: 'Internal Server Error', 
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Check server logs for details',
+    path: req.path
+  });
+});
 
 export default app;
