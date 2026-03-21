@@ -28,15 +28,12 @@ app.use('/api/settings', settingsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
 });
 
-// Connect to MongoDB
+// Connect to MongoDB (Vercel will reuse the connection across invocations)
 mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch((err) => {
-    console.error('Failed to connect to MongoDB', err);
-  });
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Failed to connect to MongoDB', err));
+
+export default app;
