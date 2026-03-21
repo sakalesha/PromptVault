@@ -6,4 +6,4 @@ const userSettingsSchema = new mongoose.Schema({
   theme: { type: String, default: 'dark' }
 }, { timestamps: true });
 
-export const UserSettings = mongoose.model('UserSettings', userSettingsSchema);
+export const UserSettings = mongoose.models.UserSettings || mongoose.model('UserSettings', userSettingsSchema);

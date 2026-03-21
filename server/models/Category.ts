@@ -7,4 +7,4 @@ const categorySchema = new mongoose.Schema({
   teamId: { type: String }
 }, { timestamps: true });
 
-export const Category = mongoose.model('Category', categorySchema);
+export const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);

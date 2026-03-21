@@ -9,4 +9,4 @@ const promptVersionSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-export const PromptVersion = mongoose.model('PromptVersion', promptVersionSchema);
+export const PromptVersion = mongoose.models.PromptVersion || mongoose.model('PromptVersion', promptVersionSchema);

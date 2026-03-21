@@ -18,4 +18,4 @@ const promptSchema = new mongoose.Schema({
   isDraft: { type: Boolean, default: false },
 }, { timestamps: true });
 
-export const Prompt = mongoose.model('Prompt', promptSchema);
+export const Prompt = mongoose.models.Prompt || mongoose.model('Prompt', promptSchema);

@@ -6,4 +6,4 @@ const teamSchema = new mongoose.Schema({
   members: [{ type: String }] // Array of user emails or UIDs
 }, { timestamps: true });
 
-export const Team = mongoose.model('Team', teamSchema);
+export const Team = mongoose.models.Team || mongoose.model('Team', teamSchema);

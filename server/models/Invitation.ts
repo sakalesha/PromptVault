@@ -9,4 +9,4 @@ const invitationSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'accepted', 'declined'], default: 'pending' },
 }, { timestamps: true });
 
-export const Invitation = mongoose.model('Invitation', invitationSchema);
+export const Invitation = mongoose.models.Invitation || mongoose.model('Invitation', invitationSchema);
