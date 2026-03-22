@@ -13,7 +13,8 @@ import settingsRoutes from '../server/routes/settingsRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/promptvault';
+const MONGO_URI = process.env.MONGO_URI;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 app.use(cors());
 app.use(express.json());
@@ -21,6 +22,9 @@ app.use(express.json());
 // Connect to MongoDB function with caching for serverless
 let isConnected = false;
 const connectDB = async () => {
+  if (!MONGO_URI) {
+    throw new Error('MONGO_URI is not defined in environment variables');
+  }
   if (isConnected) return;
   
   if (mongoose.connection.readyState === 1) {
