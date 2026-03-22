@@ -19,12 +19,18 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   if (!response.ok) {
     let errorMessage = response.statusText;
     try {
-      const errorData = await response.json();
-      errorMessage = errorData.message || errorData.error || response.statusText;
+      const text = await response.text();
+      try {
+        const errorData = JSON.parse(text);
+        errorMessage = errorData.message || errorData.error || response.statusText;
+      } catch (e) {
+        // If not JSON, use the raw text (truncated if too long)
+        errorMessage = text.slice(0, 100).replace(/<[^>]*>?/gm, ''); // Strip HTML
+      }
     } catch (e) {
-      // If not JSON, use status text
+      // If error reading text, stay with statusText
     }
-    throw new Error(`API error: ${errorMessage}`);
+    throw new Error(`API error: ${errorMessage || 'Unknown Error'}`);
   }
 
   // Handle empty responses
