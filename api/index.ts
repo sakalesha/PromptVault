@@ -69,6 +69,17 @@ app.use('/api/invitations', invitationRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingsRoutes);
 
+// Debug route to check environment keys (NOT values)
+app.get('/api/debug-env', (req, res) => {
+  res.json({ 
+    envKeys: Object.keys(process.env).filter(key => 
+      key.includes('MONGO') || key.includes('JWT') || key.includes('PORT') || key.includes('NODE')
+    ),
+    nodeVersion: process.version,
+    platform: process.platform
+  });
+});
+
 // Health check with DB status
 app.get('/api/health', async (req, res) => {
   try {
