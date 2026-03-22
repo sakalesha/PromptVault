@@ -1,4 +1,13 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
+
+export interface ICategory extends Document {
+  userId: string;
+  name: string;
+  color: string;
+  teamId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const categorySchema = new mongoose.Schema({
   userId: { type: String, required: true },
@@ -7,4 +16,4 @@ const categorySchema = new mongoose.Schema({
   teamId: { type: String }
 }, { timestamps: true });
 
-export const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
+export const Category = (mongoose.models.Category as Model<ICategory>) || mongoose.model<ICategory>('Category', categorySchema);

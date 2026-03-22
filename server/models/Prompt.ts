@@ -1,4 +1,24 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
+
+export interface IPrompt extends Document {
+  userId: string;
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+  isPublic: boolean;
+  isTemplate: boolean;
+  isFavorite: boolean;
+  copyCount: number;
+  templateUseCount: number;
+  teamId?: string;
+  collaborators: string[];
+  score: number;
+  userVotes: Map<string, number>;
+  isDraft: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const promptSchema = new mongoose.Schema({
   userId: { type: String, required: true },
@@ -18,4 +38,4 @@ const promptSchema = new mongoose.Schema({
   isDraft: { type: Boolean, default: false },
 }, { timestamps: true });
 
-export const Prompt = mongoose.models.Prompt || mongoose.model('Prompt', promptSchema);
+export const Prompt = (mongoose.models.Prompt as Model<IPrompt>) || mongoose.model<IPrompt>('Prompt', promptSchema);

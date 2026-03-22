@@ -18,15 +18,43 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/promptvaul
 app.use(cors());
 app.use(express.json());
 
+// Connect to MongoDB function with caching for serverless
+let isConnected = false;
+const connectDB = async () => {
+  if (isConnected) return;
+  
+  if (mongoose.connection.readyState === 1) {
+    isConnected = true;
+    return;
+  }
+
+  console.log('Initiating MongoDB connection...');
+  try {
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    isConnected = true;
+    console.log('Successfully connected to MongoDB');
+  } catch (err: any) {
+    console.error('CRITICAL: Failed to connect to MongoDB:', err.message);
+    throw err;
+  }
+};
+
 // Middleware to ensure DB is connected
-app.use((req, res, next) => {
-  if (mongoose.connection.readyState !== 1 && req.path !== '/api/health') {
+app.use(async (req, res, next) => {
+  if (req.path === '/api/health') return next();
+  
+  try {
+    await connectDB();
+    next();
+  } catch (error: any) {
     return res.status(503).json({ 
-      error: 'Database connecting...', 
+      error: 'Database connection failed', 
+      message: error.message,
       readyState: mongoose.connection.readyState 
     });
   }
-  next();
 });
 
 // Routes
@@ -37,21 +65,22 @@ app.use('/api/invitations', invitationRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Connect to MongoDB with timeout and proper error reporting
-console.log('Initiating MongoDB connection...');
-mongoose.connect(MONGO_URI, {
-  serverSelectionTimeoutMS: 5000,
-})
-  .then(() => console.log('Successfully connected to MongoDB'))
-  .catch((err) => console.error('CRITICAL: Failed to connect to MongoDB:', err.message));
-
 // Health check with DB status
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
-    dbState: mongoose.connection.readyState,
-    environment: process.env.NODE_ENV 
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    await connectDB();
+    res.status(200).json({ 
+      status: 'ok', 
+      dbState: mongoose.connection.readyState,
+      environment: process.env.NODE_ENV 
+    });
+  } catch (error: any) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Database connection failed',
+      dbState: mongoose.connection.readyState 
+    });
+  }
 });
 
 // Global Error Handler

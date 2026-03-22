@@ -1,4 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
+
+export interface IUserSettings extends Document {
+  userId: string;
+  defaultCategory?: string;
+  theme: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const userSettingsSchema = new mongoose.Schema({
   userId: { type: String, required: true, unique: true },
@@ -6,4 +14,4 @@ const userSettingsSchema = new mongoose.Schema({
   theme: { type: String, default: 'dark' }
 }, { timestamps: true });
 
-export const UserSettings = mongoose.models.UserSettings || mongoose.model('UserSettings', userSettingsSchema);
+export const UserSettings = (mongoose.models.UserSettings as Model<IUserSettings>) || mongoose.model<IUserSettings>('UserSettings', userSettingsSchema);
