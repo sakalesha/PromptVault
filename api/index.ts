@@ -12,47 +12,65 @@ import categoryRoutes from '../server/routes/categoryRoutes';
 import settingsRoutes from '../server/routes/settingsRoutes';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
-const JWT_SECRET = process.env.JWT_SECRET;
 
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB function with caching for serverless
-let isConnected = false;
-const connectDB = async () => {
+// Robust MongoDB connection caching for Serverless
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+const globalWithMongoose = global as typeof global & { mongoose: MongooseCache };
+let cached = globalWithMongoose.mongoose;
+
+if (!cached) {
+  cached = globalWithMongoose.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
   if (!MONGO_URI) {
     throw new Error('MONGO_URI is not defined in environment variables');
   }
-  if (isConnected) return;
-  
-  if (mongoose.connection.readyState === 1) {
-    isConnected = true;
-    return;
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+    };
+
+    console.log('Creating new MongoDB connection promise...');
+    cached.promise = mongoose.connect(MONGO_URI, opts).then((mongooseInstance) => {
+      console.log('MongoDB connected successfully');
+      return mongooseInstance;
+    });
   }
 
-  console.log('Initiating MongoDB connection...');
   try {
-    await mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    isConnected = true;
-    console.log('Successfully connected to MongoDB');
-  } catch (err: any) {
-    console.error('CRITICAL: Failed to connect to MongoDB:', err.message);
-    throw err;
+    cached.conn = await cached.promise;
+    return cached.conn;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
   }
-};
+}
 
 // Middleware to ensure DB is connected
 app.use(async (req, res, next) => {
-  if (req.path === '/api/health') return next();
+  // Skip DB for health and debug unless needed
+  if (req.path === '/api/health' || req.path === '/api/debug-env') return next();
   
   try {
     await connectDB();
     next();
   } catch (error: any) {
+    console.error('DB Connection Error in Middleware:', error.message);
     return res.status(503).json({ 
       error: 'Database connection failed', 
       message: error.message,
@@ -76,7 +94,9 @@ app.get('/api/debug-env', (req, res) => {
       key.includes('MONGO') || key.includes('JWT') || key.includes('PORT') || key.includes('NODE')
     ),
     nodeVersion: process.version,
-    platform: process.platform
+    platform: process.platform,
+    timestamp: new Date().toISOString(),
+    envLoaded: !!process.env.MONGO_URI
   });
 });
 
@@ -87,12 +107,15 @@ app.get('/api/health', async (req, res) => {
     res.status(200).json({ 
       status: 'ok', 
       dbState: mongoose.connection.readyState,
-      environment: process.env.NODE_ENV 
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString()
     });
   } catch (error: any) {
+    console.error('Health check DB error:', error.message);
     res.status(500).json({ 
       status: 'error', 
       message: 'Database connection failed',
+      error: error.message,
       dbState: mongoose.connection.readyState 
     });
   }
@@ -100,11 +123,12 @@ app.get('/api/health', async (req, res) => {
 
 // Global Error Handler
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error('Unhandled Server Error:', err);
-  res.status(500).json({ 
+  console.error('Unhandled API Error:', err);
+  res.status(err.status || 500).json({ 
     error: 'Internal Server Error', 
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Check server logs for details',
-    path: req.path
+    message: err.message || 'Check server logs for details',
+    path: req.path,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 });
 
