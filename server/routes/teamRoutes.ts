@@ -1,6 +1,6 @@
 import express from 'express';
-import { Team } from '../models/Team';
-import { verifyToken } from '../middleware/auth';
+import { Team } from '../models/Team.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import express from 'express';
-import { PromptVersion } from '../models/PromptVersion';
-import { verifyToken } from '../middleware/auth';
+import { PromptVersion } from '../models/PromptVersion.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router({ mergeParams: true }); // to access :promptId from parent router if needed
 

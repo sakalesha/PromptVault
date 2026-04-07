@@ -1,6 +1,6 @@
 import express from 'express';
-import { UserSettings } from '../models/UserSettings';
-import { verifyToken } from '../middleware/auth';
+import { UserSettings } from '../models/UserSettings.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import express from 'express';
-import { Category } from '../models/Category';
-import { verifyToken } from '../middleware/auth';
+import { Category } from '../models/Category.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 

@@ -2,12 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import authRoutes from './routes/authRoutes';
-import promptRoutes from './routes/promptRoutes';
-import teamRoutes from './routes/teamRoutes';
-import invitationRoutes from './routes/invitationRoutes';
-import categoryRoutes from './routes/categoryRoutes';
-import settingsRoutes from './routes/settingsRoutes';
+import authRoutes from './routes/authRoutes.js';
+import promptRoutes from './routes/promptRoutes.js';
+import teamRoutes from './routes/teamRoutes.js';
+import invitationRoutes from './routes/invitationRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
 
 dotenv.config();
 

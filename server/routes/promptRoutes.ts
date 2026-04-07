@@ -1,6 +1,6 @@
 import express from 'express';
-import { Prompt } from '../models/Prompt';
-import { verifyToken } from '../middleware/auth';
+import { Prompt } from '../models/Prompt.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
