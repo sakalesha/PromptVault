@@ -103,8 +103,10 @@ export function Dashboard({ theme, toggleTheme }: DashboardProps) {
   });
 
   const sortedPrompts = [...filteredPrompts].sort((a, b) => {
-    if (sortBy === 'newest') return (b.updatedAt?.toMillis() || 0) - (a.updatedAt?.toMillis() || 0);
-    if (sortBy === 'oldest') return (a.updatedAt?.toMillis() || 0) - (b.updatedAt?.toMillis() || 0);
+    const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    const timeB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+    if (sortBy === 'newest') return timeB - timeA;
+    if (sortBy === 'oldest') return timeA - timeB;
     if (sortBy === 'top') return (b.score || 0) - (a.score || 0);
     if (sortBy === 'copies') return (b.copyCount || 0) - (a.copyCount || 0);
     return 0;
@@ -894,7 +896,7 @@ export function Dashboard({ theme, toggleTheme }: DashboardProps) {
           <div className="flex items-center gap-4 text-xs text-zinc-500">
             <div className="flex items-center gap-1.5 bg-zinc-900 px-2.5 py-1 rounded-md border border-white/5">
               <Calendar className="w-3.5 h-3.5" />
-              {previewPrompt?.updatedAt?.toDate().toLocaleDateString()}
+              {previewPrompt?.updatedAt ? new Date(previewPrompt.updatedAt).toLocaleDateString() : 'Just now'}
             </div>
             {previewPrompt?.category && (
               <div className="flex items-center gap-1.5 bg-zinc-900 px-2.5 py-1 rounded-md border border-white/5">

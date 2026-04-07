@@ -10,8 +10,8 @@ export interface Prompt {
   isFavorite?: boolean;
   copyCount?: number;
   templateUseCount?: number;
-  createdAt: any; // Firestore Timestamp
-  updatedAt: any; // Firestore Timestamp
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
   teamId?: string;
   collaborators?: string[]; // Array of user emails or UIDs
   score?: number;
@@ -24,7 +24,7 @@ export interface Team {
   name: string;
   ownerId: string;
   members: string[];
-  createdAt: any;
+  createdAt?: string | Date;
 }
 
 export interface Invitation {
@@ -35,7 +35,7 @@ export interface Invitation {
   inviterId: string;
   inviterName: string;
   status: 'pending' | 'accepted' | 'declined';
-  createdAt: any;
+  createdAt?: string | Date;
 }
 
 export interface PromptVersion {
@@ -44,7 +44,7 @@ export interface PromptVersion {
   content: string;
   category: string;
   tags: string[];
-  createdAt: any; // Firestore Timestamp
+  createdAt?: string | Date;
 }
 
 export interface Category {

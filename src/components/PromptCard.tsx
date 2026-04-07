@@ -32,11 +32,11 @@ export function PromptCard({ prompt, onEdit, onDelete, onViewHistory, onShare, o
     toast.success('Prompt copied to clipboard');
   };
 
-  const formattedDate = prompt.updatedAt?.toDate().toLocaleDateString('en-US', {
+  const formattedDate = prompt.updatedAt ? new Date(prompt.updatedAt).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
-  }) || 'Just now';
+  }) : 'Just now';
 
   return (
     <motion.div
