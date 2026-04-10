@@ -56,91 +56,98 @@ export function PromptCard({ prompt, onEdit, onDelete, onViewHistory, onShare, o
           prompt.isTemplate ? "border-indigo-500/30 bg-indigo-500/5 hover:border-indigo-500/50" : ""
         )}
       >
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
+        <div className="relative flex flex-col gap-4 mb-4">
+          <div className="flex items-start gap-3">
             <button 
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleSelect?.();
               }}
-              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
+              className={cn(
+                "mt-1 w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0",
                 isSelected 
                   ? 'bg-indigo-600 border-indigo-600 text-white' 
                   : 'bg-bg-card border-border-strong text-transparent group-hover:border-indigo-500/30'
-              }`}
+              )}
             >
-              <Check className={`w-3.5 h-3.5 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
+              <Check className={cn("w-3.5 h-3.5", isSelected ? 'opacity-100' : 'opacity-0')} />
             </button>
-            <div className="flex flex-col gap-2 min-w-0 flex-1">
+            <div className="flex-1 min-w-0">
               <h3 
-                className="text-lg font-semibold text-text-heading line-clamp-2 group-hover:text-indigo-500 transition-colors"
+                className="text-lg font-bold text-text-heading line-clamp-2 group-hover:text-indigo-500 transition-colors leading-tight mb-2"
                 title={prompt.title}
               >
                 {prompt.title}
               </h3>
+              
               <div className="flex flex-wrap items-center gap-1.5">
                 {prompt.isPublic && (
                   <div title="Public" className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-                    <Globe className="w-3 h-3 text-emerald-500" />
-                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Public</span>
+                    <Globe className="w-2.5 h-2.5 text-emerald-500" />
+                    <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">Public</span>
                   </div>
                 )}
                 {prompt.isTemplate && (
                   <div className="flex items-center gap-1.5 px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 rounded-md">
-                    <LayoutTemplate className="w-3 h-3 text-indigo-400" />
-                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Template</span>
+                    <LayoutTemplate className="w-2.5 h-2.5 text-indigo-400" />
+                    <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider">Template</span>
                   </div>
                 )}
                 {prompt.isDraft && (
                   <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md">
-                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Draft</span>
+                    <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Draft</span>
                   </div>
                 )}
                 {prompt.isFavorite && (
                   <div title="Favorite" className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md">
-                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Favorite</span>
+                    <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
+                    <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Favorite</span>
                   </div>
                 )}
                 {prompt.teamId && (
                   <div title="Team Prompt" className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded-md">
-                    <Users className="w-3 h-3 text-blue-400" />
-                    <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Team</span>
+                    <Users className="w-2.5 h-2.5 text-blue-400" />
+                    <span className="text-[9px] font-bold text-blue-400 uppercase tracking-wider">Team</span>
                   </div>
                 )}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(); }} 
-              className={`h-8 w-8 ${prompt.isFavorite ? 'text-amber-400' : 'text-text-muted'} hover:text-amber-400`}
-              title={prompt.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-            >
-              <Star className={`w-3.5 h-3.5 ${prompt.isFavorite ? 'fill-amber-400' : ''}`} />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleCopy} className="h-8 w-8 text-text-muted hover:text-text-heading" title="Copy Content">
-              <Copy className="w-3.5 h-3.5" />
-            </Button>
-            {prompt.isTemplate && (
-              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onUseTemplate?.(); }} className="h-8 w-8 text-indigo-400 hover:text-text-heading" title="Use Template">
-                <LayoutTemplate className="w-3.5 h-3.5" />
+
+          {/* Absolute Hover Actions Overlay */}
+          <div className="absolute top-0 right-0 flex items-center gap-1 translate-x-1 -translate-y-1 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
+            <div className="flex items-center gap-0.5 bg-zinc-900/90 backdrop-blur-md border border-white/10 rounded-xl p-1 shadow-xl">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(); }} 
+                className={cn("h-7 w-7 rounded-lg", prompt.isFavorite ? 'text-amber-400' : 'text-zinc-400 hover:text-amber-400')}
+                title={prompt.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+              >
+                <Star className={cn("w-3.5 h-3.5", prompt.isFavorite ? 'fill-amber-400' : '')} />
               </Button>
-            )}
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onShare(); }} className="h-8 w-8 text-text-muted hover:text-text-heading">
-              <Share2 className="w-3.5 h-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onViewHistory(); }} className="h-8 w-8 text-text-muted hover:text-text-heading">
-              <History className="w-3.5 h-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(); }} className="h-8 w-8">
-              <Edit2 className="w-3.5 h-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(); }} className="h-8 w-8 text-red-500 hover:bg-red-500/10">
-              <Trash2 className="w-3.5 h-3.5" />
-            </Button>
+              <Button variant="ghost" size="icon" onClick={handleCopy} className="h-7 w-7 rounded-lg text-zinc-400 hover:text-white" title="Copy Content">
+                <Copy className="w-3.5 h-3.5" />
+              </Button>
+              {prompt.isTemplate && (
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onUseTemplate?.(); }} className="h-7 w-7 rounded-lg text-indigo-400 hover:text-indigo-300" title="Use Template">
+                  <LayoutTemplate className="w-3.5 h-3.5" />
+                </Button>
+              )}
+              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onShare(); }} className="h-7 w-7 rounded-lg text-zinc-400 hover:text-white" title="Share">
+                <Share2 className="w-3.5 h-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onViewHistory(); }} className="h-7 w-7 rounded-lg text-zinc-400 hover:text-white" title="History">
+                <History className="w-3.5 h-3.5" />
+              </Button>
+              <div className="w-px h-4 bg-white/10 mx-0.5" />
+              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(); }} className="h-7 w-7 rounded-lg text-indigo-400 hover:text-indigo-300" title="Edit">
+                <Edit2 className="w-3.5 h-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(); }} className="h-7 w-7 rounded-lg text-red-500 hover:bg-red-500/10 hover:text-red-400" title="Delete">
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
           </div>
         </div>
 
