@@ -71,14 +71,18 @@ export function PromptCard({ prompt, onEdit, onDelete, onViewHistory, onShare, o
             >
               <Check className={`w-3.5 h-3.5 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
             </button>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold text-text-heading line-clamp-1 group-hover:text-indigo-500 transition-colors">
-                  {prompt.title}
-                </h3>
+            <div className="flex flex-col gap-2 min-w-0 flex-1">
+              <h3 
+                className="text-lg font-semibold text-text-heading line-clamp-2 group-hover:text-indigo-500 transition-colors"
+                title={prompt.title}
+              >
+                {prompt.title}
+              </h3>
+              <div className="flex flex-wrap items-center gap-1.5">
                 {prompt.isPublic && (
-                  <div title="Public">
+                  <div title="Public" className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
                     <Globe className="w-3 h-3 text-emerald-500" />
+                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Public</span>
                   </div>
                 )}
                 {prompt.isTemplate && (
@@ -93,13 +97,15 @@ export function PromptCard({ prompt, onEdit, onDelete, onViewHistory, onShare, o
                   </div>
                 )}
                 {prompt.isFavorite && (
-                  <div title="Favorite">
+                  <div title="Favorite" className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md">
                     <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Favorite</span>
                   </div>
                 )}
                 {prompt.teamId && (
-                  <div title="Team Prompt">
+                  <div title="Team Prompt" className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded-md">
                     <Users className="w-3 h-3 text-blue-400" />
+                    <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Team</span>
                   </div>
                 )}
               </div>
